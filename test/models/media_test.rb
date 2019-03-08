@@ -195,14 +195,18 @@ class MediaTest < ActiveSupport::TestCase
     end
   end
 
-  test "should set user" do
+  test "should set current user as user when user is blank" do
     u = create_user
+    u2 = create_user
     t = create_team
     tu = create_team_user team: t, user: u, role: 'owner'
     p = create_project team: t
     with_current_user_and_team(u, t) do
-      m = create_media project_id: p.id
-      assert_equal u, m.user
+      m1 = create_media project_id: p.id, user: u2
+      assert_equal u2, m1.user
+
+      m2 = Claim.create quote: 'media quote'
+      assert_equal u, m2.user
     end
   end
 

@@ -529,14 +529,15 @@ en:
     user_not_present: Current user not found during data import. Please notify the
       support team of this incident.
     user_not_authorized: Sorry, you are not allowed to import data into this team.
-    invalid_project: Invalid project %{project}
-    invalid_user: Invalid author %{user}
+    invalid_project: "Invalid project: there is no project %{project} on team %{team}"
+    invalid_user: "Invalid user: there is no user %{user}"
     invalid_status: Invalid status %{status}
     blank_user: Invalid blank author
     blank_annotator: Invalid blank annotator
     blank_project: Invalid blank project
-    invalid_annotator: Invalid annotator %{user}
-    invalid_assignee: Invalid assignee %{user}
+    invalid_annotator: "Invalid annotator: there is no user %{user}"
+    invalid_assignee: "Invalid assignee: there is no user %{user}"
+    cannot_create_project_media: Cannot create project media
   mail_subject_assignments_ready: "[%{team} - %{project}] Assignments update is ready"
   mail_body_assignments_ready_assign: |-
     Hello %{username},
