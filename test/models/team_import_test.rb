@@ -161,12 +161,12 @@ class TeamImportTest < ActiveSupport::TestCase
 
     result = @team.import_spreadsheet(@@spreadsheet_id, @@worksheet.title, @user.id)
     assert_match("#{I18n.t("team_import.invalid_user", { user: data1[:user] })}, "\
-                 "#{I18n.t("team_import.invalid_project", { project: data1[:projects].split(',')[0] })}, "\
-                 "#{I18n.t("team_import.invalid_project", { project: data1[:projects].split(',')[1] })}",
+                 "#{I18n.t("team_import.invalid_project", { team: @team.slug, project: data1[:projects].split(',')[0] })}, "\
+                 "#{I18n.t("team_import.invalid_project", { team: @team.slug, project: data1[:projects].split(',')[1] })}",
       result[row1][:messages].join(', ')
     )
     assert_match("#{I18n.t("team_import.invalid_user", { user: data2[:user] })}, "\
-                 "#{I18n.t("team_import.invalid_project", { project: data2[:projects] })}",
+                 "#{I18n.t("team_import.invalid_project", { team: @team.slug, project: data2[:projects] })}",
       result[row2][:messages].join(', ')
     )
   end
