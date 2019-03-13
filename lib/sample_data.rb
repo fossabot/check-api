@@ -364,7 +364,6 @@ module SampleData
         m.file = f
       end
     end
-
     m.save!
     unless options[:project_id].blank?
       p = Project.where(id: options[:project_id]).last
@@ -462,7 +461,7 @@ module SampleData
     options = { disable_es_callbacks: true, user: u }.merge(options)
     pm = ProjectMedia.new
     options[:project] = create_project unless options.has_key?(:project)
-    options[:media] = create_valid_media unless options.has_key?(:media)
+    options[:media] = create_valid_media unless options.has_key?(:media) || options.has_key?(:url) || options.has_key?(:quote)
     options.each do |key, value|
       pm.send("#{key}=", value) if pm.respond_to?("#{key}=")
     end

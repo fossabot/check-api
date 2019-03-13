@@ -519,7 +519,7 @@ en:
             invite_owner: Invite, approve, and remove team owners
             invite_members: Invite, approve, and remove team members
   team_import:
-    invalid_google_spreadsheet_url: Invalid spreadsheet URL %{spreadsheet_url}
+    invalid_google_spreadsheet_url: "Invalid spreadsheet URL: %{spreadsheet_url}"
     not_found_google_spreadsheet_url: Spreadsheet not found at %{spreadsheet_url}
     cannot_authenticate_with_the_credentials: Cannot authenticate Google Drive with
       the current credentials. Please contact the support team to notify them of this

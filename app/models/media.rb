@@ -79,7 +79,7 @@ class Media < ActiveRecord::Base
   end
 
   def set_user
-    self.user = User.current unless User.current.nil?
+    self.user = User.current unless User.current.nil? || !self.user_id.nil?
   end
 
   def self.class_from_input(input)

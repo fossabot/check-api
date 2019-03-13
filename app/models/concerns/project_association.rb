@@ -86,7 +86,7 @@ module ProjectAssociation
 
     def set_media_or_source
       self.set_media if self.class_name == 'ProjectMedia' && self.media_id.nil?
-      self.set_source if self.class_name == 'ProjectSource'
+      self.set_source if self.class_name == 'ProjectSource' && self.source_id.nil?
     end
 
     def set_user

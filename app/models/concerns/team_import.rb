@@ -7,14 +7,18 @@ module TeamImport
   module ClassMethods
 
     def spreadsheet_id(url)
-      pattern = /https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9\-\_]+)/
+      pattern = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9\-\_]+)/
       match = url.match(pattern)
       match ? match[1] : nil
     end
 
     def import_spreadsheet_in_background(spreadsheet_url, team_id, user_id)
       spreadsheet_id = self.spreadsheet_id(spreadsheet_url)
-      error = { message: I18n.t('team_import.invalid_google_spreadsheet_url', spreadsheet_url: spreadsheet_url), code: 'INVALID_VALUE'}
+      error = {
+        message: I18n.t('team_import.invalid_google_spreadsheet_url'),
+        code: 'INVALID_VALUE',
+        data: { spreadsheet_url: spreadsheet_url }
+      }
       raise error.to_json unless spreadsheet_id
       TeamImportWorker.perform_async(team_id, spreadsheet_id, user_id)
     end

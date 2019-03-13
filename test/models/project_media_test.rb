@@ -64,7 +64,7 @@ class ProjectMediaTest < ActiveSupport::TestCase
   end
 
   test "should find media by normalized url" do
-    url = 'http://test.com'
+    url = 'https://www.test.com'
     pender_url = CONFIG['pender_url_private'] + '/api/medias'
     response = '{"type":"media","data":{"url":"' + url + '/normalized","type":"item"}}'
     WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
@@ -361,7 +361,7 @@ class ProjectMediaTest < ActiveSupport::TestCase
     attributes.delete('username')
     attributes.each{|k| assert_not pm.overridden[k]}
     # Claim media
-    pm = create_project_media quote: 'Claim', project: p
+    pm = ProjectMedia.create quote: 'Claim', project: p
     pm.embed={title: 'title', description: 'description', username: 'username'}.to_json
     pm.overridden_embed_attributes.each{|k| assert_not pm.overridden[k]}
   end
@@ -1055,14 +1055,14 @@ class ProjectMediaTest < ActiveSupport::TestCase
 
     with_current_user_and_team(u, t) do
       assert_difference 'ProjectSource.count' do
-        create_project_media project: p, url: media_url
+        ProjectMedia.create project: p, url: media_url, user: u
       end
       # should not duplicate ProjectSource for same account
       assert_no_difference 'ProjectSource.count' do
-        create_project_media project: p, url: media2_url
+        ProjectMedia.create project: p, url: media2_url, user: u
       end
       assert_no_difference 'ProjectSource.count' do
-        create_project_media project: p, quote: 'Claim', quote_attributions: {name: 'UNIVERSITÄT'}.to_json
+        ProjectMedia.create project: p, quote: 'Claim', user: u, quote_attributions: {name: 'UNIVERSITÄT'}.to_json
       end
     end
     # test move media to project with same source
