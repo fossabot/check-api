@@ -10,7 +10,8 @@ class Bot::SmoochTest < ActiveSupport::TestCase
     DynamicAnnotation::Field.delete_all
     create_translation_status_stuff
     create_verification_status_stuff(false)
-    create_annotation_type_and_fields('smooch', { 'Data' => ['JSON', false] })
+    create_annotation_type_and_fields('Smooch', { 'Data' => ['JSON', false] })
+    create_annotation_type_and_fields('Smooch Response', { 'Data' => ['JSON', true] })
     create_annotation_type annotation_type: 'reverse_image', label: 'Reverse Image'
     WebMock.disable_net_connect! allow: /#{CONFIG['elasticsearch_host']}/
     Sidekiq::Testing.inline!
@@ -529,10 +530,12 @@ class Bot::SmoochTest < ActiveSupport::TestCase
     filepath = File.join(Rails.root, 'public', 'memebuster', "#{a.id}.png")
     assert !File.exist?(filepath)
     a = Dynamic.find(a.id)
+    a.action = 'save'
     a.set_fields = { memebuster_operation: 'save' }.to_json
     a.save!
     assert !File.exist?(filepath)
     a = Dynamic.find(a.id)
+    a.action = 'publish'
     a.set_fields = { memebuster_operation: 'publish' }.to_json
     a.save!
     assert File.exist?(filepath)
@@ -616,7 +619,7 @@ class Bot::SmoochTest < ActiveSupport::TestCase
       s.status = 'in_progress'
       s.save!
       I18n.expects(:t).with do |first_arg, second_arg|
-        [:smooch_bot_result, :mail_subject_update_status].include?(first_arg)
+        [:smooch_bot_result, :mail_subject_update_status, :error_project_archived].include?(first_arg)
       end.at_least_once
       I18n.expects(:t).with('statuses.media.verified.label', { locale: 'en' }).once
       I18n.expects(:t).with('statuses.media.in_progress.label', { locale: 'en' }).never
