@@ -1,2 +1,6 @@
+DatabaseConsistencyCheckers:
+  MissingIndexChecker:
+    enabled: false
+
 'PaperTrail::VersionAssociation':
   enabled: false
