@@ -118,3 +118,6 @@ gem 'redis-objects'
 gem 'connection_pool'
 gem 'bitly'
 gem 'database_consistency', group: :development, require: false
+gem 'useragent', '~> 0.16.10'
+gem 'authtrail'
+gem 'omniauth-google-oauth2'
