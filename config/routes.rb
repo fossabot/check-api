@@ -47,6 +47,18 @@ Rails.application.routes.draw do
     end
   end
 
+  # Montage
+  namespace :ah, path: '_ah', defaults: { format: 'json' } do
+    namespace :api do
+      namespace :greenday do
+        namespace :v1 do
+          match 'ping' => 'base#ping', via: [:get]
+          match '/users/me' => 'users#me', via: [:get]
+        end
+      end
+    end
+  end
+
   match '/test/confirm_user' => 'test#confirm_user', via: :get
   match '/test/make_team_public' => 'test#make_team_public', via: :get
   match '/test/user' => 'test#new_user', via: :get
