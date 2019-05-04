@@ -39,4 +39,13 @@ class GreendayUsersControllerTest < ActionController::TestCase
     get :me
     assert_response 401
   end
+
+  test "should get user stats" do
+    u = create_omniauth_user info: { name: 'Test User' }
+    authenticate_with_user(u)
+    get :stats
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal u.id, response['id']
+  end
 end 

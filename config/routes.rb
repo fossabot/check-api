@@ -52,8 +52,10 @@ Rails.application.routes.draw do
     namespace :api do
       namespace :greenday do
         namespace :v1 do
-          match 'ping' => 'base#ping', via: [:get]
-          match '/users/me' => 'users#me', via: [:get]
+          match 'ping' => 'base#ping', via: [:get, :options]
+          match '/users/me' => 'users#me', via: [:get, :options]
+          match '/users/me/stats' => 'users#stats', via: [:get, :options]
+          match '/project' => 'projects#index', via: [:get, :options]
         end
       end
     end

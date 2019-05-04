@@ -5,7 +5,7 @@ module Ah
         class BaseController < ::Api::V1::BaseApiController
           skip_before_filter :authenticate_from_token!
 
-          before_action :authenticate_montage_user
+          before_action :authenticate_montage_user, unless: proc { request.options? }
           before_action :set_current_user, :set_current_team, :load_ability
 
           def ping
