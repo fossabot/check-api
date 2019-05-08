@@ -5,23 +5,23 @@ class Ah::Api::Greenday::V1::UsersController < Ah::Api::Greenday::V1::BaseContro
     user = User.where(token: token).last || current_api_user
     json = {}
     unless user.nil?
-      name = user.name.split(/\s/)
+      user = user.extend(Montage::User)
       json = {
-        accepted_nda: !user.last_accepted_terms_at.blank?,
-        date_joined: user.created_at.to_s,
+        accepted_nda: user.accepted_nda,
+        date_joined: user.date_joined,
         email: user.email,
-        first_name: name.first ,
+        first_name: user.first_name,
         id: user.id,
         is_active: true,
         is_googler: false,
         is_staff: false,
-        is_superuser: user.is_admin,
+        is_superuser: user.is_superuser,
         is_whitelisted: true,
         language: 'en',
-        last_login: user.last_sign_in_at.to_s,
-        last_name: name.last,
-        profile_img_url: user.profile_image,
-        username: user.login
+        last_login: user.last_login,
+        last_name: user.last_name,
+        profile_img_url: user.profile_img_url,
+        username: user.username
       }
     end
     render json: json, status: 200
