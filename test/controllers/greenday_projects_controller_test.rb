@@ -18,4 +18,14 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     assert response['is_list']
     assert_kind_of Array, response['items']
   end
+
+  test "should create project" do
+    u = create_omniauth_user info: { name: 'Test User' }
+    authenticate_with_user(u)
+    assert_difference 'Team.count' do
+      @request.env['RAW_POST_DATA'] = { name: 'Foo', description: 'Bar' }.to_json
+      post :create
+      assert_response :success
+    end
+  end
 end

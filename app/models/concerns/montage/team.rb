@@ -25,7 +25,7 @@ module Montage::Project
   end
 
   def admin_ids
-    self.team_users.where(role: 'owner').map(&:user_id)
+    self.team_users.where(role: 'owner', status: 'member').map(&:user_id)
   end
 
   def assigned_user_ids
