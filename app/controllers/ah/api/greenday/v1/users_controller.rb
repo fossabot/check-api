@@ -27,13 +27,12 @@ class Ah::Api::Greenday::V1::UsersController < Ah::Api::Greenday::V1::BaseContro
     render json: json, status: 200
   end
 
-  # FIXME: Return actual numbers
   def stats
-    user = current_api_user
+    user = current_api_user.extend(Montage::User)
     json = {
-      id: user&.id,
-      tags_added: 0,
-      videos_watched: 0
+      id: user.id,
+      tags_added: user.tags_added,
+      videos_watched: 0 # FIXME: We need to track that information
     }
     render json: json, status: 200
   end

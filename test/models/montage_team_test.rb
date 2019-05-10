@@ -16,10 +16,25 @@ class MontageTeamTest < ActiveSupport::TestCase
   end
 
   test "should return number of videos" do
+    pender_url = CONFIG['pender_url_private'] + '/api/medias'
     team = create_team.extend(Montage::Project)
     assert_equal 0, team.video_count
     p = create_project team: team
     3.times { create_project_media(project: p) }
+    3.times do |i|
+      url = random_url
+      response = '{"type":"media","data":{"url":"' + url + '","type":"item"}}'
+      WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+      l = create_link url: url
+      create_project_media project: p, media: l
+    end
+    3.times do |i|
+      url = 'https://www.youtube.com/watch?v=' + random_string
+      response = '{"type":"media","data":{"url":"' + url + '","type":"item"}}'
+      WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+      l = create_link url: url
+      create_project_media project: p, media: l
+    end
     3.times { create_project_media }
     assert_equal 3, team.video_count
   end

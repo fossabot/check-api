@@ -32,4 +32,8 @@ module Montage::User
   def username
     self.login
   end
+
+  def tags_added
+    PaperTrail::Version.where(whodunnit: self.id.to_s, event_type: 'create_tag').count
+  end
 end

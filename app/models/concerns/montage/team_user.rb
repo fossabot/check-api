@@ -19,7 +19,7 @@ module Montage::ProjectUser
 
   # FIXME: Need to track that information
   def last_updates_viewed
-    self.created
+    self.user.extend(Montage::User).last_login
   end
 
   def as_current_user_info

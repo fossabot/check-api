@@ -29,9 +29,7 @@ class MontageTeamUserTest < ActiveSupport::TestCase
     t = create_team
     u = create_user
     tu = create_team_user(team: t, user: u).extend(Montage::ProjectUser)
-    assert_nothing_raised do
-      Time.parse(tu.last_updates_viewed)
-    end
+    assert_kind_of String, tu.last_updates_viewed
   end
 
   test "should return user information as a hash" do

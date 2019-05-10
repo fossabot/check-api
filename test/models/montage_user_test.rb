@@ -42,4 +42,18 @@ class MontageUserTest < ActiveSupport::TestCase
   test "should return the username" do
     assert_equal 'foo_bar', @user.username
   end
+
+  test "should return number of tags added by user" do
+    u = create_user is_admin: true
+    t = create_team
+    create_team_user user: u, team: t
+    p = create_project
+    pm = create_project_media project: p
+    3.times { create_tag(annotated: pm) }
+    3.times { create_tag }
+    with_current_user_and_team(u, t) do
+      3.times { create_tag(annotated: pm) }
+    end
+    assert_equal 3, u.reload.extend(Montage::User).tags_added
+  end
 end 

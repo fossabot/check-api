@@ -10,9 +10,8 @@ module Montage::Project
     self.privacy_project
   end
 
-  # FIXME: Counting everything, not only videos
   def video_count
-    ProjectMedia.joins(:project).where('projects.team_id' => self.id).count
+    ProjectMedia.joins(:project).joins(:media).where('projects.team_id' => self.id).where("medias.url LIKE 'https://www.youtube.com%'").count
   end
 
   def video_tag_instance_count
