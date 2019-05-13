@@ -69,4 +69,10 @@ class MontageTeamTest < ActiveSupport::TestCase
     assert_equal [u1.id, u2.id].sort, team.admin_ids.sort
     assert_equal [u1.id, u2.id, u3.id, u4.id].sort, team.assigned_user_ids.sort
   end
+
+  test "should return team as a Montage project JSON" do
+    team = create_team.extend(Montage::Project)
+    team_user = create_team_user(team: team, role: 'owner').extend(Montage::ProjectUser)
+    assert_kind_of Hash, team.team_as_montage_project_json(team_user)
+  end
 end 

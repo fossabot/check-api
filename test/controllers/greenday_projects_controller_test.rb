@@ -28,4 +28,16 @@ class GreendayProjectsControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
+
+  test "should get project" do
+    name = random_string
+    t = create_team name: name
+    u = create_omniauth_user
+    create_team_user team: t, user: u
+    authenticate_with_user(u)
+    get :show, id: t.id
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal name, response['name']
+  end
 end

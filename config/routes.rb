@@ -57,6 +57,7 @@ Rails.application.routes.draw do
           match '/users/me/stats' => 'users#stats', via: [:get, :options]
           match '/project' => 'projects#index', via: [:get, :options]
           match '/project' => 'projects#create', via: [:post]
+          match '/project/:id' => 'projects#show', via: [:get]
         end
       end
     end

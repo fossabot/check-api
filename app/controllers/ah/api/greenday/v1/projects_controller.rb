@@ -6,17 +6,7 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
       user.team_users.each do |team_user|
         team_user = team_user.extend(Montage::ProjectUser)
         team = team_user.team.extend(Montage::Project)
-        items << {
-          created: team.created,
-          current_user_info: team_user.as_current_user_info,
-          id: team.id,
-          modified: team.modified,
-          name: team.name,
-          privacy_project: team.privacy_project,
-          privacy_tags: team.privacy_tags,
-          video_count: team.video_count,
-          video_tag_instance_count: team.video_tag_instance_count
-        }
+        items << team.team_as_montage_project_json(team_user)
       end
     end
     json = {
@@ -35,29 +25,20 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
     team.save!
     team = team.extend(Montage::Project)
     team_user = TeamUser.where(team_id: team.id, user_id: User.current&.id).last.extend(Montage::ProjectUser)
-    owner = TeamUser.where(team_id: team.id, role: 'owner', status: 'member').first.user.extend(Montage::User)
-
-    json = {
-      admin_ids: team.admin_ids,
-      assigned_user_ids: team.assigned_user_ids,
-      created: team.created,
-      current_user_info: team_user.as_current_user_info,
-      description: team.description,
-      id: team.id,
-      modified: team.modified, 
-      name: team.name,
-      owner: {
-        email: owner.email, 
-        first_name: owner.first_name, 
-        id: owner.id, 
-        last_name: owner.last_name, 
-        profile_img_url: owner.profile_img_url
-      }, 
-      privacy_project: team.privacy_project, 
-      privacy_tags: team.privacy_tags, 
-      video_tag_instance_count: team.video_tag_instance_count
-    }
-
+    json = team.team_as_montage_project_json(team_user)
     render json: json, status: 200
+  end
+
+  def show
+    id = params[:id]
+    team = Team.where(id: id).last
+    if team.nil?
+      render text: 'Not Found', status: 404
+    else
+      team = team.extend(Montage::Project)
+      team_user = TeamUser.where(team_id: team.id, user_id: User.current&.id).last.extend(Montage::ProjectUser)
+      json = team.team_as_montage_project_json(team_user)
+      render json: json, status: 200
+    end
   end
 end
