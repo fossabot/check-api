@@ -40,4 +40,14 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     response = JSON.parse(@response.body)
     assert_equal name, response['name']
   end
+
+  test "should return error if project was not found" do
+    name = random_string
+    t = create_team name: name
+    u = create_omniauth_user
+    create_team_user team: t, user: u
+    authenticate_with_user(u)
+    get :show, id: 0
+    assert_response 404
+  end
 end
