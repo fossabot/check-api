@@ -53,11 +53,14 @@ Rails.application.routes.draw do
       namespace :greenday do
         namespace :v1 do
           match 'ping' => 'base#ping', via: [:get, :options]
-          match '/users/me' => 'users#me', via: [:get, :options]
           match '/users/me/stats' => 'users#stats', via: [:get, :options]
-          match '/project' => 'projects#index', via: [:get, :options]
-          match '/project' => 'projects#create', via: [:post]
+          match '/users/me' => 'users#me', via: [:get, :options]
+          match '/project/:project_id/collection/:collection_id' => 'collections#update', via: [:put, :options]
+          match '/project/:project_id/collection/:collection_id' => 'collections#show', via: [:get, :options]
+          match '/project/:id/collection' => 'projects#collection', via: [:get, :post, :options]
           match '/project/:id' => 'projects#show', via: [:get]
+          match '/project' => 'projects#create', via: [:post, :options]
+          match '/project' => 'projects#index', via: [:get, :options]
         end
       end
     end

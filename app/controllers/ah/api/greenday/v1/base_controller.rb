@@ -5,6 +5,7 @@ module Ah
         class BaseController < ::Api::V1::BaseApiController
           skip_before_filter :authenticate_from_token!
 
+          before_action :check_if_options_request
           before_action :authenticate_montage_user, unless: proc { request.options? }
           before_action :set_current_user, :set_current_team, :load_ability
 
@@ -38,6 +39,12 @@ module Ah
 
           def load_ability
             @ability = Ability.new if signed_in?
+          end
+
+          def check_if_options_request
+            if request.options?
+              render json: true, status: 200
+            end
           end
         end
       end
