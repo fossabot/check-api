@@ -2,6 +2,7 @@ require_relative '../test_helper'
 
 class MontageUserTest < ActiveSupport::TestCase
   def setup
+    super
     @user = create_user(name: 'Foo Bar', login: 'foo_bar', is_admin: false).extend(Montage::User)
   end
 
