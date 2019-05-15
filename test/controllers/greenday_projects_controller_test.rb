@@ -50,4 +50,27 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     get :show, id: 0
     assert_response 404
   end
+
+  test "should return a collection" do
+    t = create_team
+    u = create_user
+    2.times { create_project(team: t) }
+    create_team_user team: t, user: u
+    authenticate_with_user(u)
+    get :collection, id: t.id
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal 2, response['items'].size
+  end
+
+  test "should create a collection" do
+    t = create_team
+    u = create_user
+    create_team_user team: t, user: u, role: 'owner'
+    authenticate_with_user(u)
+    @request.env['RAW_POST_DATA'] = { name: 'Foo', project_id: t.id }.to_json
+    assert_difference 'Project.count' do
+      post :collection, id: t.id
+    end
+  end
 end

@@ -34,4 +34,9 @@ class GreendayUsersControllerTest < ActionController::TestCase
     get :ping, team: t.slug
     assert_kind_of Ability, assigns(:ability)
   end
+
+  test "should return true for options requests" do
+    process :ping, 'OPTIONS'
+    assert_response :success
+  end
 end 
