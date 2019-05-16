@@ -94,6 +94,8 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     response = '{"type":"media","data":' + data.to_json + '}'
     WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
 
+    WebMock.stub_request(:head, "/http:\/\/localhost.*/")
+
     @request.env['RAW_POST_DATA'] = { youtube_ids: ['abc', 'xyz'] }.to_json
     assert_difference 'ProjectMedia.count' do
       post :batch_create, id: t.id
