@@ -76,6 +76,8 @@ class GreendayProjectsControllerTest < ActionController::TestCase
   end
 
   test "should create videos in batches and return errors" do
+    WebMock.stub_request(:head, "/localhost.*/")
+    
     t = create_team
     p = create_project team: t
     u = create_user
@@ -93,8 +95,6 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     data = { url: url, provider: 'youtube', type: 'item' }
     response = '{"type":"media","data":' + data.to_json + '}'
     WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
-
-    WebMock.stub_request(:head, "/http:\/\/localhost.*/")
 
     @request.env['RAW_POST_DATA'] = { youtube_ids: ['abc', 'xyz'] }.to_json
     assert_difference 'ProjectMedia.count' do
