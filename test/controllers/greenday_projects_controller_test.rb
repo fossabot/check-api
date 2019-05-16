@@ -7,6 +7,7 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     @request.env['devise.mapping'] = Devise.mappings[:api_user]
     sign_out('user')
     User.current = nil
+    WebMock.disable_net_connect!
   end
 
   test "should get projects as a list" do
@@ -72,5 +73,56 @@ class GreendayProjectsControllerTest < ActionController::TestCase
     assert_difference 'Project.count' do
       post :collection, id: t.id
     end
+  end
+
+  test "should create videos in batches and return errors" do
+    t = create_team
+    p = create_project team: t
+    u = create_user
+    create_team_user team: t, user: u, role: 'owner'
+    authenticate_with_user(u)
+    
+    pender_url = CONFIG['pender_url_private'] + '/api/medias'
+    
+    url = 'https://www.youtube.com/watch?v=abc'
+    data = { url: url, provider: 'youtube', type: 'profile' }
+    response = '{"type":"media","data":' + data.to_json + '}'
+    WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+
+    url = 'https://www.youtube.com/watch?v=xyz'
+    data = { url: url, provider: 'youtube', type: 'item' }
+    response = '{"type":"media","data":' + data.to_json + '}'
+    WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+
+    @request.env['RAW_POST_DATA'] = { youtube_ids: ['abc', 'xyz'] }.to_json
+    assert_difference 'ProjectMedia.count' do
+      post :batch_create, id: t.id
+    end
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal 1, response['videos'].size
+    assert_equal 2, response['items'].size
+  end
+
+  test "should return videos" do
+    pender_url = CONFIG['pender_url_private'] + '/api/medias'
+    url = 'https://www.youtube.com/watch?v=123'
+    data = { url: url, provider: 'youtube', type: 'item' }
+    response = '{"type":"media","data":' + data.to_json + '}'
+    WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+    m = create_media url: url
+
+    t = create_team
+    p = create_project team: t
+    2.times { create_project_media(project: p) }
+    create_project_media project: p, media: m
+    u = create_user
+    create_team_user team: t, user: u, role: 'owner'
+    authenticate_with_user(u)
+
+    get :video, id: t.id
+    assert_response :success
+    response = JSON.parse(@response.body)
+    assert_equal 1, response['items'].size
   end
 end

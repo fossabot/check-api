@@ -11,7 +11,11 @@ module Montage::Project
   end
 
   def video_count
-    ProjectMedia.joins(:project).joins(:media).where('projects.team_id' => self.id).where("medias.url LIKE 'https://www.youtube.com%'").count
+    self.video.count
+  end
+
+  def video
+    ProjectMedia.joins(:project).joins(:media).where('projects.team_id' => self.id).where("medias.url LIKE 'https://www.youtube.com%'")
   end
 
   def video_tag_instance_count

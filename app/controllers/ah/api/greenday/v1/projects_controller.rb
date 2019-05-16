@@ -1,5 +1,5 @@
 class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseController
-  before_action :check_if_team_exists, only: [:show, :collection]
+  before_action :check_if_team_exists, only: [:show, :collection, :batch_create, :video]
 
   def index
     items = []
@@ -28,6 +28,53 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
     team = team.extend(Montage::Project)
     team_user = TeamUser.where(team_id: team.id, user_id: User.current&.id).last.extend(Montage::ProjectUser)
     json = team.team_as_montage_project_json(team_user)
+    render json: json, status: 200
+  end
+
+  def batch_create
+    return if @team.nil?
+    data = JSON.parse(request.raw_post)
+    items = []
+    videos = []
+    project = @team.projects.first # FIXME: Montage supports videos without a collection, but Check doesn't support project medias without a project
+    data['youtube_ids'].each do |id|
+      url = "https://www.youtube.com/watch?v=#{id}"
+      begin
+        pm = ProjectMedia.create! url: url, project_id: project.id
+        items << {
+          msg: 'ok',
+          success: true,
+          youtube_id: id
+        }
+      rescue StandardError => e
+        items << {
+          mgs: e.message,
+          success: false,
+          youtube_id: id
+        }
+      end
+    end
+    @team.video.each do |pm|
+      videos << pm.extend(Montage::Video).project_media_as_montage_video_json
+    end
+    json = {
+      is_list: true,
+      items: items,
+      videos: videos
+    }
+    render json: json, status: 200
+  end
+
+  def video
+    return if @team.nil?
+    items = []
+    @team.video.each do |pm|
+      items << pm.extend(Montage::Video).project_media_as_montage_video_json
+    end
+    json = {
+      is_list: true,
+      items: items,
+    }
     render json: json, status: 200
   end
 

@@ -57,6 +57,8 @@ Rails.application.routes.draw do
           match '/users/me' => 'users#me', via: [:get, :options]
           match '/project/:project_id/collection/:collection_id' => 'collections#update', via: [:put, :options]
           match '/project/:project_id/collection/:collection_id' => 'collections#show', via: [:get, :options]
+          match '/project/:id/video/batch-create' => 'projects#batch_create', via: [:put, :options]
+          match '/project/:id/video' => 'projects#video', via: [:get, :options]
           match '/project/:id/collection' => 'projects#collection', via: [:get, :post, :options]
           match '/project/:id' => 'projects#show', via: [:get]
           match '/project' => 'projects#create', via: [:post, :options]
