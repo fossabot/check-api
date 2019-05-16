@@ -2,12 +2,14 @@ require File.join(File.expand_path(File.dirname(__FILE__)), '..', 'test_helper')
 
 class GreendayProjectsControllerTest < ActionController::TestCase
   def setup
+    require 'sidekiq/testing'
     super
     @controller = Ah::Api::Greenday::V1::ProjectsController.new
     @request.env['devise.mapping'] = Devise.mappings[:api_user]
     sign_out('user')
     User.current = nil
     WebMock.disable_net_connect!
+    Sidekiq::Testing.fake!
   end
 
   test "should get projects as a list" do
