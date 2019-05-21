@@ -25,6 +25,8 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
     team.description = data['description']
     team.slug = Team.slug_from_name(data['name']) + '-' + Time.now.to_i.to_s
     team.save!
+    # FIXME: Montage supports videos without a collection, but Check doesn't support project medias without a project... that's why we create a project by default
+    Project.create!(title: team.name, team_id: team.id)
     team = team.extend(Montage::Project)
     team_user = TeamUser.where(team_id: team.id, user_id: User.current&.id).last.extend(Montage::ProjectUser)
     json = team.team_as_montage_project_json(team_user)
@@ -36,7 +38,8 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
     data = JSON.parse(request.raw_post)
     items = []
     videos = []
-    project = @team.projects.first # FIXME: Montage supports videos without a collection, but Check doesn't support project medias without a project
+    # FIXME: Montage supports videos without a collection, but Check doesn't support project medias without a project... that's why we get one by default
+    project = @team.projects.first || Project.create!(title: @team.name, team_id: @team.id)
     data['youtube_ids'].each do |id|
       url = "https://www.youtube.com/watch?v=#{id}"
       begin
@@ -46,6 +49,7 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
           success: true,
           youtube_id: id
         }
+        videos << pm.extend(Montage::Video).project_media_as_montage_video_json
       rescue StandardError => e
         items << {
           mgs: e.message,
@@ -53,9 +57,6 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
           youtube_id: id
         }
       end
-    end
-    @team.video.each do |pm|
-      videos << pm.extend(Montage::Video).project_media_as_montage_video_json
     end
     json = {
       is_list: true,
@@ -68,8 +69,11 @@ class Ah::Api::Greenday::V1::ProjectsController < Ah::Api::Greenday::V1::BaseCon
   def video
     return if @team.nil?
     items = []
-    @team.video.each do |pm|
+    pmids = []
+    @team.video(params[:collection_id].to_i).each do |pm|
+      next if pmids.include?(pm.id)
       items << pm.extend(Montage::Video).project_media_as_montage_video_json
+      pmids << pm.id
     end
     json = {
       is_list: true,
