@@ -47,6 +47,8 @@ module Montage::Video
   end
 
   def youtube_id
+    id = self.youtube_api_data['id']
+    return id unless id.blank?
     match = self.media.url.match(/^https:\/\/www\.youtube\.com\/watch\?v=([^&]+)/)
     match ? match[1] : nil
   end
