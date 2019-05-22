@@ -37,4 +37,33 @@ class GreendayCollectionsControllerTest < ActionController::TestCase
     get :show, collection_id: p.id, project_id: t.id
     assert_response :success
   end
+
+  test "should add video to collection" do
+    u = create_omniauth_user info: { name: 'Test User' }
+    authenticate_with_user(u)
+    t = create_team
+    create_team_user team: t, user: u, role: 'owner'
+    p = create_project team: t, title: 'Foo'
+
+    pender_url = CONFIG['pender_url_private'] + '/api/medias'
+    
+    url = 'https://www.youtube.com/watch?v=abc'
+    data = { url: url, provider: 'youtube', type: 'profile' }
+    response = '{"type":"media","data":' + data.to_json + '}'
+    WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+
+    url = 'https://www.youtube.com/watch?v=xyz'
+    data = { url: url, provider: 'youtube', type: 'item' }
+    response = '{"type":"media","data":' + data.to_json + '}'
+    WebMock.stub_request(:get, pender_url).with({ query: { url: url } }).to_return(body: response)
+
+    m = create_media url: url
+    create_project_media media: m, project: p
+
+    @request.env['RAW_POST_DATA'] = { youtube_ids: ['abc', 'xyz'] }.to_json
+    assert_no_difference 'ProjectMedia.count' do
+      post :add_batch, collection_id: p.id, project_id: t.id
+    end
+    assert_response :success
+  end
 end 

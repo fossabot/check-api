@@ -96,6 +96,22 @@ class MontageProjectMediaTest < ActiveSupport::TestCase
     assert_kind_of Hash, pm.project_media_as_montage_video_json
   end
 
+  test "should return duration" do
+    name = random_string
+    ProjectMedia.any_instance.stubs(:embed).returns({ 'raw' => { 'api' => { 'duration' => 320 } } })
+    pm = create_project_media.extend(Montage::Video)
+    assert_equal 320, pm.duration
+    ProjectMedia.any_instance.unstub(:embed)
+  end
+
+  test "should return pretty duration" do
+    name = random_string
+    ProjectMedia.any_instance.stubs(:embed).returns({ 'raw' => { 'api' => { 'duration' => 320 } } })
+    pm = create_project_media.extend(Montage::Video)
+    assert_equal '00:05:20', pm.pretty_duration
+    ProjectMedia.any_instance.unstub(:embed)
+  end
+
   protected
 
   def mock_youtube_video(id)

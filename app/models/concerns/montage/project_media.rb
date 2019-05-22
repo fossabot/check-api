@@ -59,6 +59,15 @@ module Montage::Video
     self.youtube_api_data['channel_title']
   end
 
+  def duration
+    self.youtube_api_data['duration'].to_i
+  end
+
+  def pretty_duration
+    t = self.duration
+    "%02d:%02d:%02d" % [t / 3600 % 24, t / 60 % 60, t % 60]
+  end
+
   def project_media_as_montage_video_json
     {
       channel_id: self.channel_id,
@@ -75,14 +84,14 @@ module Montage::Video
       publish_date: self.publish_date,
       youtube_id: self.youtube_id,
       tag_count: self.tag_count,
+      pretty_duration: self.pretty_duration,
+      duration: self.duration,
       recorded_date_overridden: false, # FIXME: Implement this
       watch_count: 0, # FIXME: Implement this
       watched: false, # FIXME: Implement this
-      pretty_duration: '01:00', # FIXME: Implement this
       precise_location: true, # FIXME: Implement this
       location_overridden: false, # FIXME: Implement this
       missing_from_youtube: false, # FIXME: Implement this
-      duration: 100, # FIXME: Implement this
       favourited: false, # FIXME: Implement this
     }
   end
