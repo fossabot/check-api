@@ -188,6 +188,18 @@ class DynamicAnnotation::FieldTest < ActiveSupport::TestCase
     end
   end
 
+  test "should query by JSON key" do
+    json = create_field_type field_type: 'json', label: 'JSON'
+    create_field_instance name: 'metadata', field_type_object: json
+    create_field field_name: 'metadata', value: { provider: 'youtube', external_id: 10 }.to_json
+    create_field field_name: 'metadata', value: { provider: 'twitter', external_id: 20 }.to_json
+    create_field field_name: 'metadata', value: { provider: 'twitter', external_id: 30 }.to_json
+    assert_equal 2, DynamicAnnotation::Field.find_in_json({ provider: 'twitter' }).count
+    assert_equal 1, DynamicAnnotation::Field.find_in_json({ provider: 'youtube' }).count
+    assert_equal 1, DynamicAnnotation::Field.find_in_json({ provider: 'twitter', external_id: 20 }).count
+    assert_equal 1, DynamicAnnotation::Field.find_in_json({ provider: 'twitter', external_id: 30 }).count
+  end
+
   protected
 
   def create_geojson_field
